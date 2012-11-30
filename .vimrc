@@ -1,4 +1,3 @@
-lan mes en_US
 set guifont=Consolas:cRUSSIAN
 runtime colors/desert.vim
 
@@ -8,7 +7,7 @@ set modelines=0
 set laststatus=2
 set statusline=%f%m%w%y%q\ l=%l\ c=%c\ %{\"fenc=\".(&fenc).\"\ enc=\".(&enc)}
 
-set langmap=ÔÈÑÂÓÀÏĞØÎËÄÜÒÙÇÉÊÛÅÃÌÖ×Íß;ABCDEFGHIJKLMNOPQRSTUVWXYZ,ôèñâóàïğøîëäüòùçéêûåãìö÷íÿ;abcdefghijklmnopqrstuvwxyz
+set langmap=Ğ¤Ğ˜Ğ¡Ğ’Ğ£ĞĞŸĞ Ğ¨ĞĞ›Ğ”Ğ¬Ğ¢Ğ©Ğ—Ğ™ĞšĞ«Ğ•Ğ“ĞœĞ¦Ğ§ĞĞ¯;ABCDEFGHIJKLMNOPQRSTUVWXYZ,Ñ„Ğ¸ÑĞ²ÑƒĞ°Ğ¿Ñ€ÑˆĞ¾Ğ»Ğ´ÑŒÑ‚Ñ‰Ğ·Ğ¹ĞºÑ‹ĞµĞ³Ğ¼Ñ†Ñ‡Ğ½Ñ;abcdefghijklmnopqrstuvwxyz
 
 set backspace=2
 
@@ -31,11 +30,10 @@ set expandtab
 set tabstop=4
 set shiftwidth=4
 
+set undodir=~/.vimundo
 set undofile
 set visualbell
 set cursorline
-
-hi CursorLine ctermbg=1 guibg=grey40
 
 nnoremap / /\v
 vnoremap / /\v
@@ -50,7 +48,7 @@ nnoremap <tab> %
 vnoremap <tab> %
 
 set list
-set listchars=tab:>-,eol:¬
+set listchars=tab:>-,eol:Â¬
 
 nnoremap <up> <nop>
 nnoremap <down> <nop>
