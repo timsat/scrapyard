@@ -1,4 +1,4 @@
-set guifont=Consolas:cRUSSIAN
+set guifont=Inconsolata\ Medium\ 12
 runtime colors/desert.vim
 
 
@@ -58,6 +58,10 @@ inoremap <up> <nop>
 inoremap <down> <nop>
 inoremap <left> <nop>
 inoremap <right> <nop>
+
+inoremap jj <esc>
+
+nnoremap <space> za
 nnoremap j gj
 nnoremap k gk
 vnoremap j gj
