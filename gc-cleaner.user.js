@@ -2,9 +2,11 @@
 // @name        gc-cleaner
 // @namespace   gc-cleaner
 // @include     https://code.google.com/p/lightpack/wiki
-// @version     1
+// @version     2
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
+
+var gComments;
 
 var $ = function(id) { 
     return document.getElementById(id);
@@ -14,24 +16,43 @@ function trim(s) {
     return s.replace(/^\s+|\s+$/g,'');  
 }
 
+function getCommentInfo(commentNode) {
 
-var clist = $('commentlist');
-var saw = 1;
-var i = 0;
+    var result = {};
 
-for (i=0; i<clist.children.length; i++) {
-    var commentNode = clist.children[i];
-    if (commentNode.nodeName == 'DIV' && !commentNode.className.match(/(?:^|\s)delcom(?!\S)/) ) {
-        var link = document.createElement('a');
-        link.setAttribute('href', '#');
-        link.textContent = 'delete all comments above';
-        link.addEventListener('click', function() { this.saw = saw; return deleteComments(saw) }, false);
+    var as = commentNode.getElementsByTagName("a");
 
-        var child = commentNode.children[0]
-        child.appendChild(link);
+    var i = 0;
+    while (!as[i].hasAttribute("onclick") && i < as.length) i++;
 
-        saw++;
+    var onclick = as[i].getAttribute('onclick');
+    var start = onclick.indexOf('(')+1;
+    var a = onclick.substr(start, onclick.length - start - 1).split(',');
+    var idStr = trim(a[0]);
+    var timeStr = trim(a[1]);
+    result['id'] = idStr.substr(1, idStr.length-2);
+    result['creation_time'] = timeStr.substr(1, timeStr.length-2);
+    return result;
+}
+
+function getCommentNodes() {
+    var result = new Array();
+    var commentsCount = 0;
+    var rawChildren = $("commentlist").getElementsByTagName("*");
+    for (var i=0; i < rawChildren.length; i++) {
+        var commentNode = rawChildren[i];
+        if (commentNode.nodeName == 'DIV'
+           && commentNode.className.match(/(?:^|\s)artifactcomment(?!\S)/)
+           && !commentNode.className.match(/(?:^|\s)delcom(?!\S)/) ) {
+            
+            commentNode.info = getCommentInfo(commentNode);
+
+            result[commentsCount] = commentNode;
+
+            commentsCount++;
+        }
     }
+    return result;
 }
 
 function buildGetParams(params) {
@@ -46,7 +67,7 @@ function buildGetParams(params) {
 function deleteComment(cid, time, params) {
     params['sequence_num'] = cid;
     params['create_time'] = time;
-
+    
     GM_xmlhttpRequest({
         method: "POST",
         url   : 'https://code.google.com/p/lightpack/w/delComment.do',
@@ -55,39 +76,52 @@ function deleteComment(cid, time, params) {
             "Content-Type": "application/x-www-form-urlencoded"
         }
     });
-
 }
 
-function deleteComments(num) {
+function deleteComments(ev) {
 
-    var delcom = document.getElementsByName('delcom')[0];
-    var params = { 'token'   : delcom.children[4].value,
-                   'pagename': delcom.children[3].value,
+    var forms = document.getElementsByTagName('form');
+    var i = 0;
+    while (forms[i].getAttribute('name') != 'delcom' && i < forms.length) i++;
+    var fields = forms[i].getElementsByTagName('*');
+    var params = { 'token'   : fields[4].value,
+                   'pagename': fields[3].value,
                    'mode'    : '1',
                    'sequence_num': '',
                    'create_time': '' };
 
+    var comments = gComments;
+    var toId = ev.target.info['id'];
 
-    var clist = $('commentlist');
-    var deleted = 0;
-    var i = 0;
-    while (deleted < num) {
-        var commentNode = clist.children[i];
-        if (commentNode.nodeName == 'DIV' && !commentNode.className.match(/(?:^|\s)delcom(?!\S)/) ) {
-            var onclick = commentNode.children[0].children[0].getAttribute('onclick');
-            var start = onclick.indexOf('(')+1;
-            var a = onclick.substr(start, onclick.length - start - 1).split(',');
-            var idStr = trim(a[0]);
-            var timeStr = trim(a[1]);
-            var id = idStr.substr(1, idStr.length-2);
-            var time = timeStr.substr(1, timeStr.length-2);
-            deleteComment(id,time,params);
-    //        eventFire(a, 'click');
-            deleted++;
-        }
+    i = 0;
+    do {
+        var commentNode = comments[i];
+
+        deleteComment(commentNode.info['id'], commentNode.info['creation_time'], params);
         i++;
-    }
+    } while (commentNode.info['id'] != toId);
+    var timeout = (i+1) * 100 < 2000 ? 2000 : (i+1)*100
+    setTimeout(function() { location.reload(); }, timeout);
     return false;
 }
 
-link.addEventListener('click', deleteComments, false);
+function init() {
+
+    var comments = getCommentNodes();
+    gComments = comments;
+
+    var i=0;
+    for (i=0; i < comments.length; i++) {
+        var commentNode = comments[i];
+        var link = document.createElement('a');
+        link.setAttribute('href', '#');
+        link.textContent = 'Delete this and above comments';
+        link.info = commentNode.info;
+        link.addEventListener('click', function (ev) { return deleteComments(ev); }, false);
+
+        var children = commentNode.getElementsByTagName('*');
+        children[0].appendChild(link);
+    }
+}
+
+init();
