@@ -8,11 +8,23 @@ import re
 class StopLocator:
     def __init__(self):
         self.izhGetStopsUrl = 'http://izhget.ru/rasp/st_list.php?order=0&route={0}&r=776'
+        self.izhGetAllStopsUrl = 'http://izhget.ru/rasp/st_list.php?order=1&r=776'
         self.dgisSearchApiPath = '/station/search?'
         self.dgisSearchApiHost = 'transport.api.2gis.ru'
 
     def getStopsForRoute(self, routeId):
         getStopsUrl = self.izhGetStopsUrl.format(routeId)
+        f = urllib.urlopen(getStopsUrl)
+        try:
+            soup = BeautifulSoup(f.read().decode('cp1251'))
+            stopsTags = soup.find('select', id='stn').find_all('option')
+            return map(lambda optTag: (optTag['value'], optTag.string), stopsTags)
+
+        finally:
+            f.close()
+
+    def getAllStopsForRoute(self):
+        getStopsUrl = self.izhGetAllStopsUrl
         f = urllib.urlopen(getStopsUrl)
         try:
             soup = BeautifulSoup(f.read().decode('cp1251'))
@@ -30,6 +42,7 @@ class StopLocator:
         f.write(u'\t\t"coords":[\n')
         for location in stopInfo['locations']:
             f.write(u'\t\t\t{\n')
+            f.write(u'\t\t\t\t"stationName": "{}",\n'.format(location['stationName']))
             f.write(u'\t\t\t\t"longitude": {},\n'.format(location['longitude']))
             f.write(u'\t\t\t\t"latitude": {}\n'.format(location['latitude']))
             f.write(u'\t\t\t},\n')
@@ -44,12 +57,13 @@ class StopLocator:
         response = self.dgisSearchApiConnection.getresponse()
         data = json.loads(response.read().strip('DG()'))
         result = []
-        if data['response_code'] == '200' and data['total'] == 1 :
-            for platform in data['result'][0]['platforms']:
-                if 'tram' in platform['route_types']:
-                    locationRe = r'POINT\(([0-9\.]+) ([0-9\.]+)\)'
-                    m = re.search(locationRe, platform['location'])
-                    result.append({'longitude': m.group(1), 'latitude': m.group(2)})
+        if data['response_code'] == '200' and data['total'] > 0 :
+            for station in data['result']:
+                for platform in station['platforms']:
+                    if 'tram' in platform['route_types']:
+                        locationRe = r'POINT\(([0-9\.]+) ([0-9\.]+)\)'
+                        m = re.search(locationRe, platform['location'])
+                        result.append({'stationName': station['name'],'longitude': m.group(1), 'latitude': m.group(2)})
         return result
 
     def locate(self):
@@ -57,7 +71,7 @@ class StopLocator:
         with codecs.open('out', 'w', 'utf8') as outF:
             
             outF.write(u'[\n')
-            for stopId,stopName in self.getStopsForRoute(1):
+            for stopId,stopName in self.getAllStopsForRoute():
                 locations = self.getLocations(stopName)
                 stopInfo={'stopId': stopId, 'stopName': stopName, 'locations': locations}
                 self.writeStop(outF, stopInfo)
