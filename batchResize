@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+files='*.JPG'
+for f in `ls *.JPG`; do
+    echo converting $f to conv$f
+    convert $f -filter Lanczos -define filter:blur=0.9624 -distort Resize 45% conv$f
+done
