@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        gc-cleaner
 // @namespace   gc-cleaner
-// @include     https://code.google.com/p/lightpack/wiki
+// @include     https://code.google.com/p/lightpack/wiki/*
 // @version     2
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
