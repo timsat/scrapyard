@@ -1,4 +1,4 @@
-set guifont=Inconsolata\ Medium\ 12
+set guifont=Inconsolata\ 11
 runtime colors/desert.vim
 
 
@@ -35,8 +35,8 @@ set undofile
 set visualbell
 set cursorline
 
-nnoremap / /\v
-vnoremap / /\v
+"nnoremap / /\v
+"vnoremap / /\v
 set ignorecase
 set smartcase
 set gdefault
@@ -79,9 +79,11 @@ set tags+=~/.vim/tags/boost
 set tbs
 
 " build tags of your own project with Ctrl-F12
-map <C-F12> :!ctags -R --sort=yes --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+nnoremap <C-F12> :!ctags -R --sort=yes --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
 
-map <leader><CR> <C-w><C-]>
-map <leader>f <C-w>gf
+nnoremap <leader><CR> <C-w><C-]>
+nnoremap <leader>f <C-w>gf
+nnoremap <leader>u :Ack <cword><cr>
+nnoremap t :tabnew<cr>
 
 
