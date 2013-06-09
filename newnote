@@ -1,0 +1,13 @@
+#!/bin/sh
+
+notespath=~/Insync/documents/notes
+
+notenum=1
+date=`date +%Y-%m-%d`
+notefilename=$notespath/$date
+
+while [ -f ${notefilename}_${notenum}.md ]; do notenum=$((notenum+1)); done
+
+notefilename=${notefilename}_${notenum}.md
+
+gvim $notefilename

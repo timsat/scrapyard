@@ -1,4 +1,4 @@
-set guifont=Inconsolata\ 11
+set guifont=Liberation\ mono\ 11
 runtime colors/desert.vim
 
 
@@ -79,11 +79,14 @@ set tags+=~/.vim/tags/boost
 set tbs
 
 " build tags of your own project with Ctrl-F12
-nnoremap <C-F12> :!ctags -R --sort=yes --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+nnoremap <C-F12> :! ctags -R --sort=yes --c++-kinds=+p --fields=+iaS --extra=+q ./<CR>
 
 nnoremap <leader><CR> <C-w><C-]>
 nnoremap <leader>f <C-w>gf
 nnoremap <leader>u :Ack <cword><cr>
 nnoremap t :tabnew<cr>
 
-
+au BufRead,BufNewFile *.md set filetype=markdown
+au FileType markdown :command! -range Bq :cal localFun#insertPrefix(<line1>,<line2>,'> ') 
+au FileType markdown nnoremap <leader>q :Bq<cr>
+au FileType markdown vnoremap <leader>q :Bq<cr>
