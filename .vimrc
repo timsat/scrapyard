@@ -1,12 +1,9 @@
 set guifont=Liberation\ mono\ 11
 colors elflord
-
-
-
-set modelines=0
+set ml
 
 set laststatus=2
-set statusline=%f%m%w%y%q\ l=%l\ c=%c\ %{\"fenc=\".(&fenc).\"\ enc=\".(&enc)}
+set statusline=%f%m%w%y%q\ l=%l\ c=%c\ %{\"fenc=\".(&fenc).\"\ enc=\".(&enc).\"\ ff=\".(&ff)}
 
 set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 
@@ -18,10 +15,10 @@ syntax enable
 set is
 
 set hls
+
 let mapleader=","
 nnoremap <esc><esc> :q<cr>
-nnoremap <F2> :w<cr>
-nnoremap <leader>j O<esc> 
+nnoremap <leader>j O<esc>
 nnoremap <leader>k kdd 
 "nnoremap <tab> <c-w>w
 inoremap <c-space> <c-n>
@@ -101,16 +98,14 @@ nnoremap <leader>f <C-w>gf
 "nnoremap <leader>u :Ack expand('<cword>')<cr>
 nnoremap t :tabnew<cr>
 nnoremap <leader><cr> g] 
-nnoremap <leader>t :CommandTTag<cr>
-nnoremap <leader>b :CommandTBuffer<cr>
-nnoremap <leader>o :CommandT<cr>
+nnoremap <leader>b :CtrlPMixed<cr>
+nnoremap <leader>o :CtrlP<cr>
+nnoremap <leader>w :w<cr>
 nnoremap <c-l> $
 nnoremap <c-h> ^
 
 "let g:clang_user_options='|| exit 0'
 "let g:clang_complete_copen = 1
-let g:clang_debug = 1
-
 
 au BufRead,BufNewFile *.md set filetype=markdown
 
@@ -124,4 +119,3 @@ au FileType markdown vnoremap <leader>q :Bq<cr>
 au FileType \(c\|cpp\|h\|hpp\|hxx\) :command! -range Bc :cal localFun#insertPrefix(<line1>,<line2>,'// ') 
 au FileType \(c\|cpp\|h\|hpp\|hxx\) nnoremap <leader>c :Bc<cr>
 au FileType \(c\|cpp\|h\|hpp\|hxx\) vnoremap <leader>c :Bc<cr>
-au FileType \(c\|cpp\|h\|hpp\|hxx\) set tags+=~/.vim/tags/cpp
